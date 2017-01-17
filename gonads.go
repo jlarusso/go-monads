@@ -26,7 +26,7 @@ func (m Success) Bind(f func(interface{}, Monad) Monad) Monad {
 }
 
 func (m Failure) Bind(f func(interface{}, Monad) Monad) Monad {
-	return m // don't run the current function in the chain, just pass it through.
+	return m // don't run the current function in the chain, just keep going
 }
 
 func (m Return) Success(a interface{}) Monad {
