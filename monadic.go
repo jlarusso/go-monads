@@ -4,74 +4,66 @@ import "fmt"
 
 type Monad interface {
 	Bind(func(interface{}, Monad) Monad) Monad
-	Return(interface{}) Monad
+	Success(interface{}) Monad
+	Failure(interface{}) Monad
 }
 
-// First, let's do Maybe
 type Maybe struct {
 	val *interface{}
 }
 
-var None = Maybe{nil}
+// implement Bind for Maybe to satisfy Monad
+func (m Maybe) Bind(f func(interface{}, Monad) Monad) Monad {
+	if m == Failure {
+		return Failure
+	}
+	return f(*m.val, m)
+}
+
+// implement Success for Maybe to satisfy Monad
+func (m Maybe) Success(a interface{}) Monad {
+	return Some(a)
+}
+
+func (m Maybe) Failure(a interface{}) Monad {
+
+}
+
+var Failure = Maybe{nil}
 
 func Some(a interface{}) Monad {
 	return Maybe{&a}
 }
 
-func (m Maybe) Bind(f func(interface{}, Monad) Monad) Monad {
-	if m == None {
-		return None
-	}
-	return f(*m.val, m)
-}
-
-func (m Maybe) Return(a interface{}) Monad {
-	return Some(a)
-}
-
+// How to output when doing Println
 func (m Maybe) String() string {
-	if m == None {
-		return "None"
+	if m == Failure {
+		return "Failure"
 	}
 	return fmt.Sprintf("Some(%v)", *m.val)
 }
 
-// Let's do a slice of int!
-type IntSliceMonad []int
-
-func (m IntSliceMonad) Bind(f func(interface{}, Monad) Monad) Monad {
-	result := IntSliceMonad{}
-	for _, val := range m {
-		next := f(val, m).(IntSliceMonad)
-		result = append(result, next...)
-	}
-	return result
-}
-
-func (m IntSliceMonad) Return(a interface{}) Monad {
-	return IntSliceMonad{a.(int)}
-}
-
 func main() {
 	doubleMe := func(i interface{}, m Monad) Monad {
-		return m.Return(2 * i.(int))
+		return m.Success(2 * i.(int))
 	}
 
 	tripleMe := func(i interface{}, m Monad) Monad {
-		return m.Return(3 * i.(int))
+		return m.Success(3 * i.(int))
 	}
 
 	oops := func(i interface{}, m Monad) Monad {
-		return None
+		return Failure
 	}
 
-	bothSigns := func(i interface{}, m Monad) Monad {
-		return IntSliceMonad{i.(int), -i.(int)}
-	}
+	result1 := Some(5).
+		Bind(doubleMe).
+		Bind(tripleMe)
+	fmt.Println(result1)
 
-	fmt.Println(Some(5).Bind(doubleMe).Bind(tripleMe))
-	fmt.Println(Some(3).Bind(oops).Bind(doubleMe))
+	result2 := Some(3).
+		Bind(oops).
+		Bind(doubleMe)
+	fmt.Println(result2)
 
-	var oneTwoThree = IntSliceMonad{1, 2, 3}
-	fmt.Println(oneTwoThree.Bind(doubleMe).Bind(bothSigns))
 }
