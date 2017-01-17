@@ -46,6 +46,7 @@ func (m Success) String() string {
 	return fmt.Sprintf("Success(%v)", *m.value)
 }
 
+// How to output when doing Println
 func (m Failure) String() string {
 	return fmt.Sprintf("Failure(%v)", *m.value)
 }
@@ -67,10 +68,12 @@ func main() {
 		Bind(doubleMe).
 		Bind(tripleMe)
 	fmt.Println(result1)
+	// => Success(30)
 
 	result2 := Maybe(3).
 		Bind(oops).
 		Bind(doubleMe)
 	fmt.Println(result2)
+	// => Failure(oooooops)
 
 }
