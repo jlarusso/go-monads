@@ -8,39 +8,46 @@ type Monad interface {
 	Failure(interface{}) Monad
 }
 
-type Maybe struct {
-	val *interface{}
+// https://golang.org/doc/effective_go.html#embedding
+type Return struct {
+	value *interface{}
 }
 
-// implement Bind for Maybe to satisfy Monad
-func (m Maybe) Bind(f func(interface{}, Monad) Monad) Monad {
-	if m == Failure {
-		return Failure
-	}
-	return f(*m.val, m)
+type Success struct {
+	Return
 }
 
-// implement Success for Maybe to satisfy Monad
-func (m Maybe) Success(a interface{}) Monad {
-	return Some(a)
+type Failure struct {
+	Return
 }
 
-func (m Maybe) Failure(a interface{}) Monad {
-
+func (m Success) Bind(f func(interface{}, Monad) Monad) Monad {
+	return f(*m.value, m) // execute the function and return the monad that IT returns
 }
 
-var Failure = Maybe{nil}
+func (m Failure) Bind(f func(interface{}, Monad) Monad) Monad {
+	return m // don't run the current function in the chain, just pass it through.
+}
 
-func Some(a interface{}) Monad {
-	return Maybe{&a}
+func (m Monad) Success(a interface{}) Monad {
+	return m.Success(a)
+}
+
+func (m Monad) Failure(a interface{}) Monad {
+	return m.Failure(a)
+}
+
+func Maybe(a interface{}) Monad {
+	return Success{&a}
 }
 
 // How to output when doing Println
-func (m Maybe) String() string {
-	if m == Failure {
-		return "Failure"
-	}
-	return fmt.Sprintf("Some(%v)", *m.val)
+func (m Success) String() string {
+	return fmt.Sprintf("Success(%v)", *m.value)
+}
+
+func (m Failure) String() string {
+	return fmt.Sprintf("Failure(%v)", *m.value)
 }
 
 func main() {
@@ -53,15 +60,15 @@ func main() {
 	}
 
 	oops := func(i interface{}, m Monad) Monad {
-		return Failure
+		return m.Failure("oooooops")
 	}
 
-	result1 := Some(5).
+	result1 := Maybe(5).
 		Bind(doubleMe).
 		Bind(tripleMe)
 	fmt.Println(result1)
 
-	result2 := Some(3).
+	result2 := Maybe(3).
 		Bind(oops).
 		Bind(doubleMe)
 	fmt.Println(result2)
