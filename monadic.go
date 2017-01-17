@@ -29,16 +29,16 @@ func (m Failure) Bind(f func(interface{}, Monad) Monad) Monad {
 	return m // don't run the current function in the chain, just pass it through.
 }
 
-func (m Monad) Success(a interface{}) Monad {
-	return m.Success(a)
+func (m Return) Success(a interface{}) Monad {
+	return Success{Return{&a}}
 }
 
-func (m Monad) Failure(a interface{}) Monad {
-	return m.Failure(a)
+func (m Return) Failure(a interface{}) Monad {
+	return Failure{Return{&a}}
 }
 
 func Maybe(a interface{}) Monad {
-	return Success{&a}
+	return Success{Return{&a}}
 }
 
 // How to output when doing Println
