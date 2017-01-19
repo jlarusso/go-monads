@@ -7,7 +7,7 @@ import (
 type SauceInteractor struct{}
 
 // This particular interactor requires this kind of map as the params
-func (si SauceInteractor) Act(params map[string]int) maybe.Monad {
+func (si SauceInteractor) Act(params interface{}) maybe.Monad {
 	return maybe.Maybe(params).
 		Bind(si.Sanitize).
 		Bind(si.Prepare).
