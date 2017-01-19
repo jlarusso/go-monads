@@ -1,4 +1,4 @@
-package main
+package maybe
 
 import "fmt"
 
@@ -49,31 +49,4 @@ func (m Success) String() string {
 // How to output when doing Println
 func (m Failure) String() string {
 	return fmt.Sprintf("Failure(%v)", *m.value)
-}
-
-func main() {
-	doubleMe := func(i interface{}, m Monad) Monad {
-		return m.Success(2 * i.(int))
-	}
-
-	tripleMe := func(i interface{}, m Monad) Monad {
-		return m.Success(3 * i.(int))
-	}
-
-	oops := func(i interface{}, m Monad) Monad {
-		return m.Failure("oooooops")
-	}
-
-	result1 := Maybe(5).
-		Bind(doubleMe).
-		Bind(tripleMe)
-	fmt.Println(result1)
-	// => Success(30)
-
-	result2 := Maybe(3).
-		Bind(oops).
-		Bind(doubleMe)
-	fmt.Println(result2)
-	// => Failure(oooooops)
-
 }
