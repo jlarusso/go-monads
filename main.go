@@ -6,27 +6,27 @@ import (
 )
 
 func main() {
-	params := make(map[string]int)
-	params["tomatos"] = 1
-	params["heat"] = 100
-	params["salt"] = 2
+	p1 := make(map[string]int)
+	p1["tomatoes"] = 1
+	p1["heat"] = 100
+	p1["salt"] = 2
 
-	result1 := interactors.SauceInteractor{}.Act(params)
-	fmt.Println(result1) // => Failure(Not enough tomatos)
+	result1 := interactors.SauceInteractor{}.Act(p1)
+	fmt.Println(result1) // => Failure(Not enough tomatoes)
 
-	params := make(map[string]int)
-	params["tomatos"] = 10
-	params["heat"] = 20
-	params["salt"] = 25
+	p2 := make(map[string]int)
+	p2["tomatoes"] = 10
+	p2["heat"] = 20
+	p2["salt"] = 25
 
-	result1 := interactors.SauceInteractor{}.Act(params)
-	fmt.Println(result1) // => Failure(Turn up the heat)
+	result2 := interactors.SauceInteractor{}.Act(p2)
+	fmt.Println(result2) // => Failure(Turn up the heat)
 
-	params := make(map[string]int)
-	params["tomatos"] = 5
-	params["heat"] = 100
-	params["salt"] = 2
+	p3 := make(map[string]int)
+	p3["tomatoes"] = 5
+	p3["heat"] = 100
+	p3["salt"] = 2
 
-	result1 := interactors.SauceInteractor{}.Act(params)
-	fmt.Println(result1) // => Success(30)
+	result3 := interactors.SauceInteractor{}.Act(p3)
+	fmt.Println(result3) // => Success(30)
 }
