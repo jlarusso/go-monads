@@ -1,44 +1,44 @@
-package maybe
+package monads
 
 import "fmt"
 
-type Monad interface {
-	Bind(func(interface{}, Monad) Monad) Monad
-	Success(interface{}) Monad
-	Failure(interface{}) Monad
+type Maybe interface {
+	Bind(func(interface{}, Maybe) Maybe) Maybe
+	Success(interface{}) Maybe
+	Failure(interface{}) Maybe
 }
 
 // https://golang.org/doc/effective_go.html#embedding
-type Return struct {
+type Just struct {
 	value *interface{}
 }
 
 type Success struct {
-	Return
+	Just
 }
 
 type Failure struct {
-	Return
+	Just
 }
 
-func (m Success) Bind(f func(interface{}, Monad) Monad) Monad {
+func (m Success) Bind(f func(interface{}, Maybe) Maybe) Maybe {
 	return f(*m.value, m) // execute the function and return the monad that IT returns
 }
 
-func (m Failure) Bind(f func(interface{}, Monad) Monad) Monad {
+func (m Failure) Bind(f func(interface{}, Maybe) Maybe) Maybe {
 	return m // don't run the current function in the chain, just keep going
 }
 
-func (m Return) Success(a interface{}) Monad {
-	return Success{Return{&a}}
+func (m Just) Success(a interface{}) Maybe {
+	return Success{Just{&a}}
 }
 
-func (m Return) Failure(a interface{}) Monad {
-	return Failure{Return{&a}}
+func (m Just) Failure(a interface{}) Maybe {
+	return Failure{Just{&a}}
 }
 
-func Maybe(a interface{}) Monad {
-	return Success{Return{&a}}
+func Some(a interface{}) Maybe {
+	return Success{Just{&a}}
 }
 
 // How to output when doing Println

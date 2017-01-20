@@ -1,18 +1,18 @@
 package interactors
 
 import (
-	"github.com/jlarusso/gonads/maybe"
+	"github.com/jlarusso/gonads/monads"
 )
 
 // This particular interactor requires this kind of map as the params
-func MakeSauce(params interface{}) maybe.Monad {
-	return maybe.Maybe(params).
+func MakeSauce(params interface{}) monads.Maybe {
+	return monads.Some(params).
 		Bind(Prepare).
 		Bind(Cook).
 		Bind(Taste)
 }
 
-func Prepare(params interface{}, m maybe.Monad) maybe.Monad {
+func Prepare(params interface{}, m monads.Maybe) monads.Maybe {
 	// NOTE: I'd really like to have some kind of sanitization step where the params coming into
 	// the interactor.  The type assertion below would happen there (instead of at the top of each
 	// method).  There'd be some kind of context struct specific to this package is passed from
@@ -27,7 +27,7 @@ func Prepare(params interface{}, m maybe.Monad) maybe.Monad {
 	}
 }
 
-func Cook(params interface{}, m maybe.Monad) maybe.Monad {
+func Cook(params interface{}, m monads.Maybe) monads.Maybe {
 	p := params.(map[string]int)
 
 	if p["heat"] < 80 {
@@ -37,7 +37,7 @@ func Cook(params interface{}, m maybe.Monad) maybe.Monad {
 	}
 }
 
-func Taste(params interface{}, m maybe.Monad) maybe.Monad {
+func Taste(params interface{}, m monads.Maybe) monads.Maybe {
 	p := params.(map[string]int)
 
 	if p["salt"] < 2 {
