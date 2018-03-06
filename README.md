@@ -1,2 +1,2 @@
-# gonads
-either/maybe monads implemented in go
+# go monads
+either/maybe monad implemented in go
